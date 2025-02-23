@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .calculator {
+            background-color: white;
+            width: 320px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .calculator .display {
+            background-color: #222;
+            color: white;
+            font-size: 2.5rem;
+            padding: 20px;
+            text-align: right;
+            word-wrap: break-word;
+            height: 80px;
+        }
+        .calculator .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 20px;
+        }
+        .calculator .buttons button {
+            background-color: #f0f0f0;
+            border: none;
+            padding: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+        .calculator .buttons button:hover {
+            background-color: #e0e0e0;
+        }
+        .calculator .buttons .operator {
+            background-color: #ff9f00;
+            color: white;
+        }
+        .calculator .buttons .operator:hover {
+            background-color: #ff7a00;
+        }
+        .calculator .buttons .equal {
+            background-color: #ff4d4d;
+            color: white;
+            grid-column: span 2;
+        }
+        .calculator .buttons .equal:hover {
+            background-color: #ff3333;
+        }
+        .calculator .buttons .clear {
+            background-color: #dddddd;
+        }
+        .calculator .buttons .clear:hover {
+            background-color: #cccccc;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <div class="display" id="display"></div>
+        <div class="buttons">
+            <button class="clear" id="clear">C</button>
+            <button class="operator" id="divide">/</button>
+            <button class="operator" id="multiply">*</button>
+            <button class="operator" id="subtract">-</button>
+
+            <button class="button" id="7">7</button>
+            <button class="button" id="8">8</button>
+            <button class="button" id="9">9</button>
+            <button class="operator" id="add">+</button>
+
+            <button class="button" id="4">4</button>
+            <button class="button" id="5">5</button>
+            <button class="button" id="6">6</button>
+            <button class="equal" id="equal">=</button>
+
+            <button class="button" id="1">1</button>
+            <button class="button" id="2">2</button>
+            <button class="button" id="3">3</button>
+
+            <button class="button" id="0">0</button>
+            <button class="button" id="decimal">.</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+        let currentInput = '';
+        let prevInput = '';
+        let operator = null;
+
+        function updateDisplay() {
+            display.textContent = currentInput || '0';
+        }
+
+        function clearDisplay() {
+            currentInput = '';
+            prevInput = '';
+            operator = null;
+            updateDisplay();
+        }
+
+        function appendNumber(number) {
+            if (currentInput.length < 15) {
+                currentInput += number;
+                updateDisplay();
+            }
+        }
+
+        function chooseOperator(op) {
+            if (currentInput === '') return;
+            if (prevInput !== '') {
+                calculate();
+            }
+            operator = op;
+            prevInput = currentInput;
+            currentInput = '';
+        }
+
+        function calculate() {
+            let result;
+            const prev = parseFloat(prevInput);
+            const current = parseFloat(currentInput);
+            if (isNaN(prev) || isNaN(current)) return;
+
+            switch (operator) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    if (current === 0) {
+                        result = 'Error';
+                    } else {
+                        result = prev / current;
+                    }
+                    break;
+                default:
+                    return;
+            }
+
+            currentInput = result.toString();
+            operator = null;
+            prevInput = '';
+            updateDisplay();
+        }
+
+        function appendDecimal() {
+            if (!currentInput.includes('.')) {
+                currentInput += '.';
+                updateDisplay();
+            }
+        }
+
+        document.getElementById('clear').addEventListener('click', clearDisplay);
+        document.getElementById('divide').addEventListener('click', () => chooseOperator('/'));
+        document.getElementById('multiply').addEventListener('click', () => chooseOperator('*'));
+        document.getElementById('subtract').addEventListener('click', () => chooseOperator('-'));
+        document.getElementById('add').addEventListener('click', () => chooseOperator('+'));
+        document.getElementById('equal').addEventListener('click', calculate);
+
+        const numberButtons = document.querySelectorAll('.button');
+        numberButtons.forEach(button => {
+            button.addEventListener('click', () => appendNumber(button.textContent));
+        });
+
+        document.getElementById('decimal').addEventListener('click', appendDecimal);
+    </script>
+
+</body>
+</html>
